@@ -7,8 +7,8 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DeviationRenderer;
 import org.jfree.chart.ui.RectangleInsets;
-import org.jfree.data.xy.YIntervalSeries;
-import org.jfree.data.xy.YIntervalSeriesCollection;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,32 +17,24 @@ public class ConvergenceChart {
 
     public ConvergenceChart(String chartName, double[] best_30, double[] best_40, double[] best_50) {
 
-        YIntervalSeries pop30 = new YIntervalSeries("30 Bats");
-        YIntervalSeries pop40 = new YIntervalSeries("40 Bats");
-        YIntervalSeries pop50 = new YIntervalSeries("50 Bats");
+        XYSeries pop30 = new XYSeries("30 Bats");
+        XYSeries pop40 = new XYSeries("40 Bats");
+        XYSeries pop50 = new XYSeries("50 Bats");
 
         for (int i = 0; i <= 1000; i++) {
 
-            pop30.add(i, best_30[i], best_30[i], best_30[i]);
-            pop40.add(i, best_40[i], best_40[i], best_40[i]);
-            pop50.add(i, best_50[i], best_50[i], best_50[i]);
+            pop30.add(i, best_30[i]);
+            pop40.add(i, best_40[i]);
+            pop50.add(i, best_50[i]);
         }
 
-        YIntervalSeriesCollection dataset = new YIntervalSeriesCollection();
+        XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(pop30);
         dataset.addSeries(pop40);
         dataset.addSeries(pop50);
 
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                chartName,          // chart title
-                "Iterations",                   // x axis label
-                "Fitness",       // y axis label
-                dataset,                  // data
-                true,                     // include legend
-                true,                     // tooltips
-                false                     // urls
-        );
-
+        JFreeChart chart = ChartFactory.createXYLineChart(chartName, "Iterations", "Fitness", dataset);
+        
         // get a reference to the plot for further customisation...
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setDomainPannable(true);
