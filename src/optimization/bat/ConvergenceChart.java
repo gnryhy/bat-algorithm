@@ -15,28 +15,28 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class ConvergenceChart {
 
-    public ConvergenceChart(String chartName, double[] best_30, double[] best_40, double[] best_50) {
+    public static final Map<Integer, Color> colorMap = Map.of(30, Color.RED, 40, Color.BLUE, 50, Color.BLACK);
 
-        XYSeries pop30 = new XYSeries("30 Bats");
-        XYSeries pop40 = new XYSeries("40 Bats");
-        XYSeries pop50 = new XYSeries("50 Bats");
+    public ConvergenceChart(String chartName, double[] convergenceValues, int populationSize) {
 
-        for (int i = 0; i <= 50; i++) {
+        XYSeries convergenceSeries = new XYSeries(populationSize + " Bats");
 
-            pop30.add(i, best_30[i]);
-            pop40.add(i, best_40[i]);
-            pop50.add(i, best_50[i]);
+        for (int i = 0; i <= 1000; i++) {
+
+            convergenceSeries.add(i, convergenceValues[i]);
+
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(pop30);
-        dataset.addSeries(pop40);
-        dataset.addSeries(pop50);
+        dataset.addSeries(convergenceSeries);
 
-        JFreeChart chart = ChartFactory.createXYLineChart(chartName, "Iterations", "Fitness", dataset);
+        JFreeChart chart = ChartFactory.createXYLineChart(chartName + " N=" + populationSize, "Iterations",
+                "Fitness",
+                dataset);
 
         // get a reference to the plot for further customisation...
         XYPlot plot = (XYPlot) chart.getPlot();
@@ -47,13 +47,7 @@ public class ConvergenceChart {
         DeviationRenderer renderer = new DeviationRenderer(true, false);
         renderer.setSeriesStroke(0, new BasicStroke(4.0f, BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_ROUND));
-        renderer.setSeriesStroke(1, new BasicStroke(4.0f,
-                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        renderer.setSeriesStroke(2, new BasicStroke(4.0f,
-                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        renderer.setSeriesPaint(0, Color.BLUE);
-        renderer.setSeriesPaint(1, Color.RED);
-        renderer.setSeriesPaint(2, Color.BLACK);
+        renderer.setSeriesPaint(0, colorMap.get(populationSize));
         plot.setRenderer(renderer);
 
         // change the auto tick unit selection to integer units only...
@@ -68,7 +62,8 @@ public class ConvergenceChart {
                 Files.createDirectories(Paths.get("./charts"));
             }
 
-            ChartUtils.saveChartAsPNG(new File("./charts/" + chartName + ".png"), chart, 600, 600);
+            ChartUtils.saveChartAsPNG(new File("./charts/" + chartName + "___" + populationSize + ".png"),
+                    chart, 1200, 1200);
 
         } catch (IOException e) {
 

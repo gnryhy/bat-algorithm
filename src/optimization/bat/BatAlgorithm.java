@@ -186,7 +186,7 @@ public class BatAlgorithm {
 
             convergenceValues[t + 1] = fitnessMin;
         }
-        
+
         return convergenceValues;
     }
 
@@ -201,7 +201,9 @@ public class BatAlgorithm {
             double[] result_50 = new BatAlgorithm(50, 1000, 2,
                     0.1, fd).startBat();
 
-            new ConvergenceChart(fd.getName(), result_30, result_40, result_50);
+            new ConvergenceChart(fd.getName(), result_30, 30);
+            new ConvergenceChart(fd.getName(), result_40, 40);
+            new ConvergenceChart(fd.getName(), result_50, 50);
         }
     }
 }
