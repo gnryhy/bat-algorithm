@@ -216,7 +216,8 @@ public class BenchmarkFunctions {
             totalCosine += Math.cos(2 * Math.PI * x);
         }
 
-        return -20 * Math.exp(-0.2 * Math.sqrt((1 / arr.length) * totalSquares)) - Math.exp((1 / arr.length) * totalCosine) + 20 + Math.E;
+        return -20 * Math.exp(-0.2 * Math.sqrt((1 / arr.length) * totalSquares))
+                - Math.exp((1 / arr.length) * totalCosine) + 20 + Math.E;
     };
 
     private static final Function<Double[], Double> PENALIZED_1 = (arr) -> {

@@ -21,10 +21,6 @@ public class BatAlgorithm {
     private final int maxNumOfIterations;        // Number of iterations
     private final double frequencyMin = 0.0;
     private final double frequencyMax = 2.0;
-    private final double pulseRateMin = 0;
-    private final double pulseRateMax = 1;
-    private final double loudnessMin = 0;
-    private final double loudnessMax = 1;
     private final int dimension = 2;
     private final double alpha = 0.9;
     private final Random rand = new Random();
@@ -190,11 +186,7 @@ public class BatAlgorithm {
 
             convergenceValues[t + 1] = fitnessMin;
         }
-
-        //System.out.println(Arrays.toString(convergenceValues));
-        //System.out.println("Best = " + Arrays.toString(best));
-        //System.out.println("fmin = " + fitnessMin);
-
+        
         return convergenceValues;
     }
 
