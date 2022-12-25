@@ -51,9 +51,9 @@ public class ConvergenceChart {
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         renderer.setSeriesStroke(2, new BasicStroke(4.0f,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        renderer.setSeriesFillPaint(0, new Color(255, 0, 0));
-        renderer.setSeriesFillPaint(1, new Color(255, 0, 255));
-        renderer.setSeriesFillPaint(2, new Color(0, 0, 255));
+        renderer.setSeriesPaint(0, Color.BLUE);
+        renderer.setSeriesPaint(1, Color.RED);
+        renderer.setSeriesPaint(2, Color.BLACK);
         plot.setRenderer(renderer);
 
         // change the auto tick unit selection to integer units only...
