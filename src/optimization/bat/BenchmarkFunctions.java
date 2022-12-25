@@ -16,7 +16,7 @@ public class BenchmarkFunctions {
 
             total += Math.pow(x, 2);
         }
-        
+
         return total;
     };
 
@@ -224,11 +224,11 @@ public class BenchmarkFunctions {
         // a 10 k 100 m 4
         final Function<Double, Double> u = (x) -> {
 
-            if (x > 4 || x < -4) {
+            if (x > 4d || x < -4d) {
 
                 return 100 * Math.pow((x - 10), 4);
 
-            } else if (-4 <= x && x <= 4) {
+            } else if (-4d <= x && x <= 4d) {
 
                 return 0d;
 
@@ -268,13 +268,13 @@ public class BenchmarkFunctions {
 
                 return 100 * Math.pow((x - 5), 4);
 
-            } else if (-4 <= x && x <= 4) {
+            } else if (-5 <= x && x <= 5) {
 
                 return 0d;
 
             } else {
 
-                System.err.println("PENALIZED_1 WARNING! x = " + x);
+                System.err.println("PENALIZED_2 WARNING! x = " + x);
 
                 return 0d;
             }

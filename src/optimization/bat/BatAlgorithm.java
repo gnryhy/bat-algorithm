@@ -200,14 +200,16 @@ public class BatAlgorithm {
 
     public static void main(String[] args) {
 
-        double[] result_30 = new BatAlgorithm(30, 1000, 2,
-                0.1, BenchmarkFunctions.FUNCTION_LIST.get(2)).startBat();
-        double[] result_40 = new BatAlgorithm(40, 1000, 2,
-                0.1, BenchmarkFunctions.FUNCTION_LIST.get(2)).startBat();
-        double[] result_50 = new BatAlgorithm(50, 1000, 2,
-                0.1, BenchmarkFunctions.FUNCTION_LIST.get(2)).startBat();
+        for (FunctionDefinition fd : BenchmarkFunctions.FUNCTION_LIST) {
 
-        ConvergenceChart cc = new ConvergenceChart(BenchmarkFunctions.FUNCTION_LIST.get(2).getName(), result_30,
-                result_40, result_50);
+            double[] result_30 = new BatAlgorithm(30, 1000, 2,
+                    0.1, fd).startBat();
+            double[] result_40 = new BatAlgorithm(40, 1000, 2,
+                    0.1, fd).startBat();
+            double[] result_50 = new BatAlgorithm(50, 1000, 2,
+                    0.1, fd).startBat();
+
+            new ConvergenceChart(fd.getName(), result_30, result_40, result_50);
+        }
     }
 }

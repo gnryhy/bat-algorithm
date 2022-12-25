@@ -1,7 +1,7 @@
 package optimization.bat;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -10,8 +10,11 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class ConvergenceChart {
 
@@ -21,7 +24,7 @@ public class ConvergenceChart {
         XYSeries pop40 = new XYSeries("40 Bats");
         XYSeries pop50 = new XYSeries("50 Bats");
 
-        for (int i = 0; i <= 1000; i++) {
+        for (int i = 0; i <= 50; i++) {
 
             pop30.add(i, best_30[i]);
             pop40.add(i, best_40[i]);
@@ -34,7 +37,7 @@ public class ConvergenceChart {
         dataset.addSeries(pop50);
 
         JFreeChart chart = ChartFactory.createXYLineChart(chartName, "Iterations", "Fitness", dataset);
-        
+
         // get a reference to the plot for further customisation...
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setDomainPannable(true);
@@ -42,14 +45,14 @@ public class ConvergenceChart {
         plot.setInsets(new RectangleInsets(5, 5, 5, 20));
 
         DeviationRenderer renderer = new DeviationRenderer(true, false);
-        renderer.setSeriesStroke(0, new BasicStroke(3.0f, BasicStroke.CAP_ROUND,
+        renderer.setSeriesStroke(0, new BasicStroke(4.0f, BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_ROUND));
-        renderer.setSeriesStroke(0, new BasicStroke(3.0f,
+        renderer.setSeriesStroke(1, new BasicStroke(4.0f,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        renderer.setSeriesStroke(1, new BasicStroke(3.0f,
+        renderer.setSeriesStroke(2, new BasicStroke(4.0f,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         renderer.setSeriesFillPaint(0, new Color(255, 0, 0));
-        renderer.setSeriesFillPaint(1, new Color(0, 255, 0));
+        renderer.setSeriesFillPaint(1, new Color(255, 0, 255));
         renderer.setSeriesFillPaint(2, new Color(0, 0, 255));
         plot.setRenderer(renderer);
 
@@ -58,10 +61,18 @@ public class ConvergenceChart {
         yAxis.setAutoRangeIncludesZero(false);
         yAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
-        JFrame f = new JFrame("deneme");
-        f.getContentPane().add(new ChartPanel(chart));
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.pack();
-        f.setVisible(true);
+        try {
+
+            if (!new File("./charts").exists()) {
+
+                Files.createDirectories(Paths.get("./charts"));
+            }
+
+            ChartUtils.saveChartAsPNG(new File("./charts/" + chartName + ".png"), chart, 600, 600);
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
     }
 }
