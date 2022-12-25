@@ -1,8 +1,10 @@
 package optimization.bat;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class BenchmarkFunctions {
 
@@ -12,9 +14,9 @@ public class BenchmarkFunctions {
 
         for (double x : arr) {
 
-            total += x;
+            total += Math.pow(x, 2);
         }
-
+        
         return total;
     };
 
@@ -214,8 +216,7 @@ public class BenchmarkFunctions {
             totalCosine += Math.cos(2 * Math.PI * x);
         }
 
-        return -20 * Math.exp(-0.2 * Math.sqrt((1 / arr.length) * totalSquares)) -
-                Math.exp((1 / arr.length) * totalCosine) + 20 + Math.E;
+        return -20 * Math.exp(-0.2 * Math.sqrt((1 / arr.length) * totalSquares)) - Math.exp((1 / arr.length) * totalCosine) + 20 + Math.E;
     };
 
     public static final Function<Double[], Double> PENALIZED_1 = (arr) -> {
@@ -255,8 +256,7 @@ public class BenchmarkFunctions {
             u_total += u.apply(x);
         }
 
-        return (Math.PI / arr.length) * (10 * Math.pow(Math.sin(Math.PI * y.apply(arr[0])), 2)
-                + y_total + Math.pow(y.apply(arr[arr.length - 1] - 1), 2)) + u_total;
+        return (Math.PI / arr.length) * (10 * Math.pow(Math.sin(Math.PI * y.apply(arr[0])), 2) + y_total + Math.pow(y.apply(arr[arr.length - 1] - 1), 2)) + u_total;
     };
 
     public static final Function<Double[], Double> PENALIZED_2 = (arr) -> {
@@ -293,16 +293,14 @@ public class BenchmarkFunctions {
             u_total += u.apply(x);
         }
 
-        return 0.1 * (Math.pow(Math.sin(Math.PI * arr[0]), 2) + x_total +
-                Math.pow(arr[arr.length - 1] - 1, 2) * (1 + Math.pow(Math.sin(2 * Math.PI * arr[arr.length - 1]), 2)))
-                + u_total;
+        return 0.1 * (Math.pow(Math.sin(Math.PI * arr[0]), 2) + x_total + Math.pow(arr[arr.length - 1] - 1, 2) * (1 + Math.pow(Math.sin(2 * Math.PI * arr[arr.length - 1]), 2))) + u_total;
     };
 
     public static final Function<Double[], Double> ALPINE = (arr) -> {
 
         double total = 0d;
 
-        for(double x : arr) {
+        for (double x : arr) {
 
             total += Math.abs(x * Math.sin(x) + 0.1 * x);
         }
@@ -310,7 +308,92 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double>[] FUNCTIONS = new Function[] {SPHERE, ELLIPTIC, SUM_SQUARES,
+    public static final Function<Double[], Double> LEVY = (arr) -> {
+
+        double total = 0d;
+
+        for (int i = 0; i < arr.length - 1; i++) {
+
+            total += Math.pow(arr[i] - 1, 2) * (1 + Math.pow(Math.sin(3 * Math.PI * arr[i + 1]), 2));
+        }
+
+        total += Math.pow(Math.sin(3 * Math.PI * arr[0]), 2) + Math.abs(arr[arr.length - 1] - 1) *
+                (1 + Math.pow(Math.sin(3 * Math.PI * arr[arr.length - 1]), 2));
+
+        return total;
+    };
+
+    public static final Function<Double[], Double> WEIERSTRASS = (arr) -> {
+
+        double a = 0.5;
+        double b = 3;
+        int kMax = 20;
+
+        double leftTotal = 0d;
+        double rightTotal = 0d;
+
+        for (int i = 0; i < arr.length; i++) {
+
+            for (int k = 0; k <= kMax; k++) {
+
+                leftTotal += Math.pow(a, k) * Math.cos(2 * Math.PI * Math.pow(b, k) * (arr[i] + 0.5));
+            }
+        }
+
+        for (int k = 0; k <= kMax; k++) {
+
+            rightTotal += Math.pow(a, k) * Math.cos(2 * Math.PI * Math.pow(b, k) * 0.5);
+        }
+
+        return rightTotal - arr.length * leftTotal;
+    };
+
+    public static final Function<Double[], Double> SCHAFFER = (arr) -> {
+
+        double squaresTotal = 0d;
+
+        for (double x : arr) {
+
+            squaresTotal += Math.pow(x, 2);
+        }
+
+        return 0.5d + ((Math.pow(Math.sin(Math.sqrt(squaresTotal)), 2) - 0.5d) / Math.pow((1 + 0.001 * squaresTotal),
+                2));
+
+    };
+
+    private static final ValueRange[] VALUE_RANGES = new ValueRange[]{new ValueRange(-100, 100), new ValueRange(-100,
+            100), new ValueRange(-10, 10), new ValueRange(-10, 10), new ValueRange(-10, 10),
+            new ValueRange(-100,
+                    100), new ValueRange(-100, 100), new ValueRange(-1.28, 1.28), new ValueRange(-1.28, 1.28),
+            new ValueRange(-10, 10), new ValueRange(-5.12, 5.12), new ValueRange(-5.12, 5.12), new ValueRange(-600,
+            600), new ValueRange(-500, 500), new ValueRange(-32, 32), new ValueRange(-50, 50),
+            new ValueRange(-50, 50), new ValueRange(-10, 10), new ValueRange(-10, 10), new ValueRange(-0.5, 0.5),
+            new ValueRange(-100, 100)};
+
+    private static final Function<Double[], Double>[] FUNCTIONS = new Function[]{SPHERE, ELLIPTIC, SUM_SQUARES,
             SUM_POWER, SCHWEFEL_2_22, SCHWEFEL_2_21, STEP, QUARTIC, QUARTIC_WN, ROSENBROCK, RASTRIGIN,
-            NON_CONTINIOUS_RASTRIGIN, GRIEWANK, SCHWEFEL_2_26, ACKLEY, PENALIZED_1, PENALIZED_2, ALPINE};
+            NON_CONTINIOUS_RASTRIGIN, GRIEWANK, SCHWEFEL_2_26, ACKLEY, PENALIZED_1, PENALIZED_2, ALPINE, LEVY,
+            WEIERSTRASS, SCHAFFER};
+
+    private static final String[] FUNCTION_NAMES = new String[]{"SPHERE", "ELLIPTIC", "SUM_SQUARES",
+            "SUM_POWER", "SCHWEFEL_2_22", "SCHWEFEL_2_21", "STEP", "QUARTIC", "QUARTIC_WN", "ROSENBROCK", "RASTRIGIN",
+            "NON_CONTINIOUS_RASTRIGIN", "GRIEWANK", "SCHWEFEL_2_26", "ACKLEY",
+            "PENALIZED_1", "PENALIZED_2", "ALPINE", "LEVY",
+            "WEIERSTRASS", "SCHAFFER"};
+
+    private static final Supplier<List<FunctionDefinition>> FUNCTION_PROVIDER = () -> {
+
+        List<FunctionDefinition> result = new ArrayList<>();
+
+        for (int i = 0; i < VALUE_RANGES.length; i++) {
+
+            result.add(new FunctionDefinition(FUNCTION_NAMES[i], FUNCTIONS[i], VALUE_RANGES[i]));
+        }
+
+        return result;
+    };
+
+    public static final List<FunctionDefinition> FUNCTION_LIST = FUNCTION_PROVIDER.get();
+
 }

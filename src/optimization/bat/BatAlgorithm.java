@@ -1,10 +1,11 @@
 package optimization.bat;
 
-import java.util.Random;
 import java.util.Arrays;
+import java.util.Random;
 
 public class BatAlgorithm {
 
+    private FunctionDefinition function;
     private double[][] batSolutions;        // Population/Solution (N x D)
     private double[][] velocities;        // Velocities (N x D)
     private double[][] frequency;        // Frequency : 0 to Q_MAX (N x 1)
@@ -23,11 +24,11 @@ public class BatAlgorithm {
     private final double amplitudeMax;
     private final double pulseRateMin;
     private final double pulseRateMax;
-    private final int dimension = 10;
+    private final int dimension = 2;
     private final Random rand = new Random();
 
     public BatAlgorithm(int populationSize, int maxNumOfIterations, double amplitudeMin, double amplitudeMax,
-                        double pulseRateMin, double pulseRateMax) {
+                        double pulseRateMin, double pulseRateMax, FunctionDefinition function) {
 
         this.populationSize = populationSize;
         this.maxNumOfIterations = maxNumOfIterations;
@@ -35,6 +36,7 @@ public class BatAlgorithm {
         this.pulseRateMin = pulseRateMin;
         this.amplitudeMax = amplitudeMax;
         this.amplitudeMin = amplitudeMin;
+        this.function = function;
 
         this.batSolutions = new double[populationSize][dimension];
         this.velocities = new double[populationSize][dimension];
@@ -46,11 +48,11 @@ public class BatAlgorithm {
         // Initialize bounds
         this.lowerBounds = new double[1][dimension];
         for (int i = 0; i < dimension; i++) {
-            this.lowerBounds[0][i] = -2.0;
+            this.lowerBounds[0][i] = function.getRange().getMin();
         }
         this.upperBounds = new double[1][dimension];
         for (int i = 0; i < dimension; i++) {
-            this.upperBounds[0][i] = 2.0;
+            this.upperBounds[0][i] = function.getRange().getMax();
         }
 
         // Initialize Q and V
@@ -87,11 +89,10 @@ public class BatAlgorithm {
     }
 
     private double objective(double[] Xi) {
-        double sum = 0.0;
-        for (int i = 0; i < Xi.length; i++) {
-            sum = sum + Xi[i] * Xi[i];
-        }
-        return sum;
+
+        Double[] converted = Arrays.stream(Xi).boxed().toArray(Double[]::new);
+
+        return function.getFunction().apply(converted);
     }
 
     private double[] simpleBounds(double[] Xi) {
@@ -117,10 +118,13 @@ public class BatAlgorithm {
         return Xi_temp;
     }
 
-    private void startBat() {
+    private double[] startBat() {
+
+        // initial best is included too
+        double[] convergenceValues = new double[maxNumOfIterations + 1];
+        convergenceValues[0] = this.fitnessMin;
 
         double[][] S = new double[populationSize][dimension];
-        int n_iter = 0;
 
         // Loop for all iterations/generations(MAX)
         for (int t = 0; t < maxNumOfIterations; t++) {
@@ -146,11 +150,10 @@ public class BatAlgorithm {
                     }
                 }
 
-
                 // Evaluate new solutions
                 double fnew = objective(batSolutions[i]);
 
-                // Update if the solution improves or not too loud
+                // Update if the solution improves and not too loud
                 if (fnew <= fitness[i] && rand.nextDouble() < amplitude) {
                     batSolutions[i] = S[i];
                     fitness[i] = fnew;
@@ -162,15 +165,28 @@ public class BatAlgorithm {
                     fitnessMin = fnew;
                 }
             } // end loop for N
-            n_iter = n_iter + populationSize;
+
+            convergenceValues[t + 1] = fitnessMin;
+
         } // end loop for MAX
 
-        System.out.println("Number of evaluations : " + n_iter);
+        System.out.println(Arrays.toString(convergenceValues));
         System.out.println("Best = " + Arrays.toString(best));
         System.out.println("fmin = " + fitnessMin);
+
+        return convergenceValues;
     }
 
     public static void main(String[] args) {
-        new BatAlgorithm(2000, 100, 0.0, 1.0, 0.0, 1.0).startBat();
+
+        double[] result_30 = new BatAlgorithm(30, 1000, 0.0, 1.0,
+                0.0, 1.0, BenchmarkFunctions.FUNCTION_LIST.get(0)).startBat();
+        double[] result_40 = new BatAlgorithm(40, 1000, 0.0, 1.0,
+                0.0, 1.0, BenchmarkFunctions.FUNCTION_LIST.get(0)).startBat();
+        double[] result_50 = new BatAlgorithm(50, 1000, 0.0, 1.0,
+                0.0, 1.0, BenchmarkFunctions.FUNCTION_LIST.get(0)).startBat();
+
+        ConvergenceChart cc = new ConvergenceChart(BenchmarkFunctions.FUNCTION_LIST.get(0).getName(), result_30,
+                result_40, result_50);
     }
 }
