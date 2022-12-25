@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 public class BenchmarkFunctions {
 
-    public static final Function<Double[], Double> SPHERE = (arr) -> {
+    private static final Function<Double[], Double> SPHERE = (arr) -> {
 
         double total = 0d;
 
@@ -20,7 +20,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> ELLIPTIC = (arr) -> {
+    private static final Function<Double[], Double> ELLIPTIC = (arr) -> {
 
         double total = 0d;
         int nMinusOne = arr.length - 1;
@@ -35,7 +35,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> SUM_SQUARES = (arr) -> {
+    private static final Function<Double[], Double> SUM_SQUARES = (arr) -> {
 
         double total = 0d;
         int i = 1;
@@ -49,7 +49,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> SUM_POWER = (arr) -> {
+    private static final Function<Double[], Double> SUM_POWER = (arr) -> {
 
         double total = 0d;
         int i = 1;
@@ -63,7 +63,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> SCHWEFEL_2_22 = (arr) -> {
+    private static final Function<Double[], Double> SCHWEFEL_2_22 = (arr) -> {
 
         double total = 0d;
 
@@ -82,7 +82,7 @@ public class BenchmarkFunctions {
         return total + product;
     };
 
-    public static final Function<Double[], Double> SCHWEFEL_2_21 = (arr) -> {
+    private static final Function<Double[], Double> SCHWEFEL_2_21 = (arr) -> {
 
         double max = -1;
 
@@ -97,7 +97,7 @@ public class BenchmarkFunctions {
         return max;
     };
 
-    public static final Function<Double[], Double> STEP = (arr) -> {
+    private static final Function<Double[], Double> STEP = (arr) -> {
 
         double total = 0d;
 
@@ -109,7 +109,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> QUARTIC = (arr) -> {
+    private static final Function<Double[], Double> QUARTIC = (arr) -> {
 
         double total = 0d;
         int i = 1;
@@ -123,7 +123,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> QUARTIC_WN = (arr) -> {
+    private static final Function<Double[], Double> QUARTIC_WN = (arr) -> {
 
         final Random random = new Random();
 
@@ -139,7 +139,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> ROSENBROCK = (arr) -> {
+    private static final Function<Double[], Double> ROSENBROCK = (arr) -> {
 
         double total = 0d;
 
@@ -151,7 +151,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> RASTRIGIN = (arr) -> {
+    private static final Function<Double[], Double> RASTRIGIN = (arr) -> {
 
         double total = 0d;
 
@@ -163,7 +163,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> NON_CONTINIOUS_RASTRIGIN = (arr) -> {
+    private static final Function<Double[], Double> NON_CONTINIOUS_RASTRIGIN = (arr) -> {
 
         double total = 0d;
 
@@ -177,7 +177,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> GRIEWANK = (arr) -> {
+    private static final Function<Double[], Double> GRIEWANK = (arr) -> {
 
         double total = 0d;
         double product = 1d;
@@ -193,7 +193,7 @@ public class BenchmarkFunctions {
         return 1 + (1 / 4000 * total) + product;
     };
 
-    public static final Function<Double[], Double> SCHWEFEL_2_26 = (arr) -> {
+    private static final Function<Double[], Double> SCHWEFEL_2_26 = (arr) -> {
 
         double total = 0d;
 
@@ -205,7 +205,7 @@ public class BenchmarkFunctions {
         return 418.98 * arr.length - total;
     };
 
-    public static final Function<Double[], Double> ACKLEY = (arr) -> {
+    private static final Function<Double[], Double> ACKLEY = (arr) -> {
 
         double totalSquares = 0d;
         double totalCosine = 0d;
@@ -219,7 +219,7 @@ public class BenchmarkFunctions {
         return -20 * Math.exp(-0.2 * Math.sqrt((1 / arr.length) * totalSquares)) - Math.exp((1 / arr.length) * totalCosine) + 20 + Math.E;
     };
 
-    public static final Function<Double[], Double> PENALIZED_1 = (arr) -> {
+    private static final Function<Double[], Double> PENALIZED_1 = (arr) -> {
 
         // a 10 k 100 m 4
         final Function<Double, Double> u = (x) -> {
@@ -259,7 +259,7 @@ public class BenchmarkFunctions {
         return (Math.PI / arr.length) * (10 * Math.pow(Math.sin(Math.PI * y.apply(arr[0])), 2) + y_total + Math.pow(y.apply(arr[arr.length - 1] - 1), 2)) + u_total;
     };
 
-    public static final Function<Double[], Double> PENALIZED_2 = (arr) -> {
+    private static final Function<Double[], Double> PENALIZED_2 = (arr) -> {
 
         // a 5 k 100 m 4
         final Function<Double, Double> u = (x) -> {
@@ -296,7 +296,7 @@ public class BenchmarkFunctions {
         return 0.1 * (Math.pow(Math.sin(Math.PI * arr[0]), 2) + x_total + Math.pow(arr[arr.length - 1] - 1, 2) * (1 + Math.pow(Math.sin(2 * Math.PI * arr[arr.length - 1]), 2))) + u_total;
     };
 
-    public static final Function<Double[], Double> ALPINE = (arr) -> {
+    private static final Function<Double[], Double> ALPINE = (arr) -> {
 
         double total = 0d;
 
@@ -308,7 +308,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> LEVY = (arr) -> {
+    private static final Function<Double[], Double> LEVY = (arr) -> {
 
         double total = 0d;
 
@@ -323,7 +323,7 @@ public class BenchmarkFunctions {
         return total;
     };
 
-    public static final Function<Double[], Double> WEIERSTRASS = (arr) -> {
+    private static final Function<Double[], Double> WEIERSTRASS = (arr) -> {
 
         double a = 0.5;
         double b = 3;
@@ -348,7 +348,7 @@ public class BenchmarkFunctions {
         return rightTotal - arr.length * leftTotal;
     };
 
-    public static final Function<Double[], Double> SCHAFFER = (arr) -> {
+    private static final Function<Double[], Double> SCHAFFER = (arr) -> {
 
         double squaresTotal = 0d;
 
