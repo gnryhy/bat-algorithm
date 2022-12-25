@@ -3,7 +3,6 @@ package optimization.bat;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DeviationRenderer;
 import org.jfree.chart.ui.RectangleInsets;
@@ -28,7 +27,6 @@ public class ConvergenceChart {
         for (int i = 0; i <= 1000; i++) {
 
             convergenceSeries.add(i, convergenceValues[i]);
-
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection();
@@ -49,12 +47,7 @@ public class ConvergenceChart {
                 BasicStroke.JOIN_ROUND));
         renderer.setSeriesPaint(0, colorMap.get(populationSize));
         plot.setRenderer(renderer);
-
-        // change the auto tick unit selection to integer units only...
-        NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
-        yAxis.setAutoRangeIncludesZero(false);
-        yAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-
+        
         try {
 
             if (!new File("./charts").exists()) {
