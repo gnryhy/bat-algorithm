@@ -154,9 +154,13 @@ public class BatAlgorithm {
                 // move the bat around the contemporary best solution.
                 if (rand.nextDouble() > pulseRate[i]) {
 
+                    double avgLoudness = Arrays.stream(loudness).average().orElse(0);
+
                     for (int j = 0; j < dimension; j++) {
 
-                        solution[i][j] = best[j] + 0.01 * rand.nextGaussian();
+                        double r = rand.nextDouble(-1, 1);
+
+                        solution[i][j] = best[j] + r * avgLoudness;
                     }
                 }
 
