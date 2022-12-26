@@ -93,7 +93,7 @@ public class BatAlgorithm {
         }
 
         this.fitnessMin = fitness[fmin_i];
-        this.best = batSolutions[fmin_i]; // (1xD)
+        this.best = batSolutions[fmin_i];
     }
 
     private double benchmarkFunction(double[] xValues) {
