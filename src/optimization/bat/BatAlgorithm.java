@@ -6,27 +6,27 @@ import java.util.Random;
 public class BatAlgorithm {
 
     private FunctionDefinition function;
-    private double[][] batSolutions;        // Population/Solution (N x D)
-    private double[][] velocities;        // Velocities (N x D)
-    private double[] frequency;        // Frequency : 0 to Q_MAX (N x 1)
+    private double[][] batSolutions;        // Population x Solution
+    private double[][] velocities;        // Velocities
+    private double[] frequency;        // Frequency -> frequencyMin to frequencyMin
     private double[] fitness;            // Fitness (N)
-    private double pulseRate[];            // Pulse Rate : 0 to 1
-    private final double pulseRateInitial;
-    private double loudness[];            // Loudness : A_MIN to A_MAX
-    private double[] lowerBounds;        // Lower bound (1 x D)
-    private double[] upperBounds;        // Upper bound (1 x D)
-    private double fitnessMin;        // Minimum fitness from F
-    private double[] best;            // Best solution array from X (D)
+    private double[] pulseRate;            // Pulse Rate
+    private final double pulseRateInitial; // Initial pulse rate for every bat
+    private double[] loudness;            // Loudness
+    private double[] lowerBounds;        // Lower bound
+    private double[] upperBounds;        // Upper bound
+    private double fitnessMin;        // fitness score of best solution
+    private double[] best;            // Best solution
     private final int populationSize;        // Number of bats
     private final int maxNumOfIterations;        // Number of iterations
-    private final double frequencyMin = 0.0;
-    private final double frequencyMax = 2.0;
-    private final int dimension = 2;
-    private final double alpha = 0.9;
+    private final double frequencyMin = 0.0; // Minimum frequency
+    private final double frequencyMax = 2.0; // Maximum frequency
+    private final int dimension = 2; // dimension of the problem
+    private final double alpha = 0.9; // cooling factor for loudness and pulse rate
     private final Random rand = new Random();
 
-    public BatAlgorithm(int populationSize, int maxNumOfIterations, double loudnessInitial,
-                        double pulseRateInitial, FunctionDefinition function) {
+    public BatAlgorithm(int populationSize, int maxNumOfIterations, double loudnessInitial, double pulseRateInitial,
+                        FunctionDefinition function) {
 
         this.populationSize = populationSize;
         this.maxNumOfIterations = maxNumOfIterations;
@@ -57,7 +57,7 @@ public class BatAlgorithm {
             this.upperBounds[i] = function.getRange().getMax();
         }
 
-        // Initialize Q and V
+        // Initialize Frequency and Velocity
         for (int i = 0; i < populationSize; i++) {
 
             this.frequency[i] = 0.0;
@@ -70,19 +70,18 @@ public class BatAlgorithm {
             }
         }
 
-        // Initialize X
+        // Initialize Positions
         for (int i = 0; i < populationSize; i++) {
 
             for (int j = 0; j < dimension; j++) {
 
-                this.batSolutions[i][j] =
-                        lowerBounds[j] + (upperBounds[j] - lowerBounds[j]) * rand.nextDouble();
+                this.batSolutions[i][j] = lowerBounds[j] + (upperBounds[j] - lowerBounds[j]) * rand.nextDouble();
             }
 
-            this.fitness[i] = objective(batSolutions[i]);
+            this.fitness[i] = benchmarkFunction(batSolutions[i]);
         }
 
-        // Find initial best solution
+        // Initial best solution
         int fmin_i = 0;
 
         for (int i = 0; i < populationSize; i++) {
@@ -93,94 +92,96 @@ public class BatAlgorithm {
             }
         }
 
-        // Store minimum fitness and it's index.
-        // B holds the best solution array[1xD]
         this.fitnessMin = fitness[fmin_i];
         this.best = batSolutions[fmin_i]; // (1xD)
     }
 
-    private double objective(double[] Xi) {
+    private double benchmarkFunction(double[] xValues) {
 
-        Double[] converted = Arrays.stream(Xi).boxed().toArray(Double[]::new);
-
-        return function.getFunction().apply(converted);
+        return function.getFunction().apply(Arrays.stream(xValues).boxed().toArray(Double[]::new));
     }
 
-    private double[] simpleBounds(double[] Xi) {
-        // Don't know if this should be implemented
-        double[] Xi_temp = new double[dimension];
-        System.arraycopy(Xi, 0, Xi_temp, 0, dimension);
+    private double[] boundaryCheck(double[] xValues) {
+
+        double[] tempXValues = new double[dimension];
+        System.arraycopy(xValues, 0, tempXValues, 0, dimension);
 
         for (int i = 0; i < dimension; i++) {
 
-            if (Xi_temp[i] < lowerBounds[i]) {
+            if (tempXValues[i] < lowerBounds[i]) {
 
-                Xi_temp[i] = lowerBounds[i];
+                tempXValues[i] = lowerBounds[i];
 
-            } else if (Xi_temp[i] > upperBounds[i]) {
+            } else if (tempXValues[i] > upperBounds[i]) {
 
-                Xi_temp[i] = lowerBounds[i];
+                tempXValues[i] = lowerBounds[i];
             }
         }
 
-        return Xi_temp;
+        return tempXValues;
     }
 
-    private double[] startBat() {
+    public double[] runAlgorithm() {
 
         // initial best is included too
         double[] convergenceValues = new double[maxNumOfIterations + 1];
         convergenceValues[0] = this.fitnessMin;
 
-        double[][] S = new double[populationSize][dimension];
+        double[][] solution = new double[populationSize][dimension];
 
+        // iterate until max iteration count is reached
         for (int t = 0; t < maxNumOfIterations; t++) {
             // iterate bats
             for (int i = 0; i < populationSize; i++) {
 
                 // Update frequency
                 frequency[i] = frequencyMin + (frequencyMin - frequencyMax) * rand.nextDouble();
-                // Update velocity
+                // Update velocities of every dimension
                 for (int j = 0; j < dimension; j++) {
 
                     velocities[i][j] = velocities[i][j] + (batSolutions[i][j] - best[j]) * frequency[i];
                 }
-                // Update S = X + V
+                // Update position
                 for (int j = 0; j < dimension; j++) {
 
-                    S[i][j] = batSolutions[i][j] + velocities[i][j];
+                    solution[i][j] = batSolutions[i][j] + velocities[i][j];
                 }
-                // Apply bounds/limits
-                S[i] = simpleBounds(S[i]);
 
-                // Pulse rate
+                // fix bounds
+                solution[i] = boundaryCheck(solution[i]);
+
+                // if bat's pulse rate is not greater than randomized pulse;
+                // move the bat around the contemporary best solution.
                 if (rand.nextDouble() > pulseRate[i]) {
 
                     for (int j = 0; j < dimension; j++) {
 
-                        S[i][j] = best[j] + 0.01 * rand.nextGaussian();
+                        solution[i][j] = best[j] + 0.01 * rand.nextGaussian();
                     }
                 }
 
-                S[i] = simpleBounds(S[i]);
+                // fix bounds
+                solution[i] = boundaryCheck(solution[i]);
 
                 // Evaluate new solutions
-                double fnew = objective(S[i]);
+                double newFitness = benchmarkFunction(solution[i]);
 
-                // Update if the solution improves and not too loud
-                if (fnew <= fitness[i] && rand.nextDouble() < loudness[i]) {
+                // Update the solution if it improves and is not too loud
+                if (newFitness <= fitness[i] && rand.nextDouble() < loudness[i]) {
 
-                    batSolutions[i] = S[i];
-                    fitness[i] = fnew;
+                    batSolutions[i] = solution[i];
+                    fitness[i] = newFitness;
+                    // improvement decreases loudness
                     loudness[i] = alpha * loudness[i];
+                    // improvement increases pulse rate
                     pulseRate[i] += pulseRateInitial * (1 - Math.exp(-1 * alpha * t));
                 }
 
-                // Update the current best solution
-                if (fnew <= fitnessMin) {
+                // check if this is the new best solution
+                if (newFitness <= fitnessMin) {
 
                     best = batSolutions[i];
-                    fitnessMin = fnew;
+                    fitnessMin = newFitness;
                 }
             }
 
@@ -188,22 +189,5 @@ public class BatAlgorithm {
         }
 
         return convergenceValues;
-    }
-
-    public static void main(String[] args) {
-
-        for (FunctionDefinition fd : BenchmarkFunctions.FUNCTION_LIST) {
-
-            double[] result_30 = new BatAlgorithm(30, 1000, 2,
-                    0.1, fd).startBat();
-            double[] result_40 = new BatAlgorithm(40, 1000, 2,
-                    0.1, fd).startBat();
-            double[] result_50 = new BatAlgorithm(50, 1000, 2,
-                    0.1, fd).startBat();
-
-            new ConvergenceChart(fd.getName(), result_30, 30);
-            new ConvergenceChart(fd.getName(), result_40, 40);
-            new ConvergenceChart(fd.getName(), result_50, 50);
-        }
     }
 }
