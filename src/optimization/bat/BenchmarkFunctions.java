@@ -145,7 +145,7 @@ public class BenchmarkFunctions {
 
         for (int i = 0; i < arr.length - 1; i++) {
 
-            total += 100 * (arr[i + 1] - Math.pow(arr[i], 2)) + Math.pow((arr[i] - 1), 2);
+            total += 100 * Math.pow((arr[i + 1] - Math.pow(arr[i], 2)), 2) + Math.pow((arr[i] - 1), 2);
         }
 
         return total;
@@ -346,7 +346,7 @@ public class BenchmarkFunctions {
             rightTotal += Math.pow(a, k) * Math.cos(2 * Math.PI * Math.pow(b, k) * 0.5);
         }
 
-        return rightTotal - arr.length * leftTotal;
+        return leftTotal - arr.length * rightTotal;
     };
 
     private static final Function<Double[], Double> SCHAFFER = (arr) -> {

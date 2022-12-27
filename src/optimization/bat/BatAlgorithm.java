@@ -1,5 +1,6 @@
 package optimization.bat;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -191,6 +192,11 @@ public class BatAlgorithm {
 
             convergenceValues[t + 1] = fitnessMin;
         }
+
+        DecimalFormat df = new DecimalFormat("#.####");
+        System.out.println(function.getName() + " __ " +
+                "POP_SIZE: " + populationSize + " __ " +
+                "FITNESS_VALUE: " + df.format(fitnessMin));
 
         return convergenceValues;
     }
